@@ -1,0 +1,104 @@
+!! 1.
+
+! a. Nombre Edificio3
+hostname Edificio3
+
+! b. Mensaje de entrada
+banner motd $Accesando al switch$
+
+! c. SSH
+interface vlan 150
+ip domain-name tecnm.edu.mx
+username soporte secret cisco
+crypto key generate rsa
+y
+1024
+
+ip ssh version 2
+line vty 0 15
+transport input ssh
+login local
+exit
+
+! d. Contraseñas
+enable secret privi
+
+line console 0
+password conso
+login
+logging synchronous
+exit
+
+! e. Encriptar
+service password-encryption
+
+! f. Dirección IP, gateway y VLAN 192.168.150.0/27 30
+ip default-gateway 192.168.150.1
+vlan 150
+name ADMIN
+interface f0/24
+switchport mode access
+switchport access vlan 150
+interface vlan 150
+ip address 192.168.150.5 255.255.255.224
+no shutdown
+interface vlan 1
+no shutdown
+
+! g. Desactivar búsqueda del DNS
+exit
+no ip domain-lookup
+
+! h. Devolver al prompt
+line console 0
+logging synchronous
+line vty 0 15
+logging synchronous
+
+! i. Troncales
+exit
+interface g0/1
+switchport mode trunk
+
+!! 2. Seguridad de DHCP y CDP
+
+! Apagar todos los puertos
+interface range f0/1-24
+shutdown
+interface range g0/1-2
+shutdown
+
+interface range f0/24, g0/1, f0/1, f0/2, f0/10, f0/11, f0/20
+no shutdown
+exit
+
+! DHCP
+ip dhcp snooping
+interface range g0/1, f0/20
+ip dhcp snooping trust
+
+!!! Entrar a los puertos y ponerles shutdown
+!!! Trust nomás va en servidores, troncales y 
+!!!    accesspoints
+
+! CDP
+no cdp run
+
+!! 3. Seguridad de puertos
+
+! a. Modo sticky en donde haya hosts
+interface range f0/24, f0/1, f0/2, f0/10, f0/11, f0/20
+switchport mode access
+switchport port-security
+switchport port-security mac-address sticky
+
+! b. Activar restict
+switchport port-security violation restrict
+
+! c. Solo un Host, solo permitir una MAC
+interface range f0/24, f0/1, f0/2, f0/10, f0/11
+switchport port-security maximum 1
+
+! e. Puertos AP, permitir 3 (en el puerto donde estén conectados los ap al switch)
+interface range f0/20
+switchport port-security maximum 3

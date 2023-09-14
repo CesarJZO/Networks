@@ -1,0 +1,177 @@
+$ Connect via secure shell
+ssh -l <username> <ip>
+
+### TODO:
+    [ ] Especificar los puertos de la vlan 100 y conectar 
+        ahí los administradores para todo lo demás, 
+        conectarse en la vlan 1 con el bloque 10
+    [ ] Activar trunk
+    [ ] Interconectar todos los switches con vlan 100
+    [ ] Hacer confiables los puertos troncales
+    [ ] 
+
+### later ###
+
+inter vlan 1
+no ip address
+interface fa0/2
+switchport mode trunk
+
+inter vlan 100
+name Administrator
+ip address 192.168.10.5 255.255.255.224
+
+ip defa 192.168.10.1
+
+trust
+
+inteface (puerto donde está conectado el server)
+ip dhcp snooping trust
+
+switchport port-security mac-address sticky
+
+### Para conectarse a varias interfaces 
+interface range f0/20-21
+
+sw mode access
+sw port
+sw port mac-address sticky
+
+--------------------------------------------
+
+hostname S1
+ip dhcp snooping
+ip default-gateway 192.168.10.97
+no ip domain-lookup
+enable secret 123
+
+line console 0
+password cisco
+login
+logging synchronous
+
+service password-encryption
+
+interface vlan 1
+ip address 192.168.10.98 255.255.255.224
+no shutdown
+
+interface f0/2
+switchport mode access
+switchport access vlan 100
+
+ip domain-name redes.dev
+username cesarjzo secret segura
+crypto key generate rsa
+y
+1024
+
+ip ssh version 2
+
+line vty 0 15
+
+transport input ssh
+login local
+
+password telnet
+login
+logging synchronous
+
+----------------------------------------------------
+
+hostname S2
+ip default-gateway 192.168.10.97
+no ip domain-lookup
+enable secret cisco
+
+line console 0
+password 123
+login
+logging synchronous
+
+service password-encryption
+
+interface vlan 1
+ip address 192.168.10.99 255.255.255.224
+no shutdown
+
+line vty 0 15
+password telnet
+login
+loggin synchronous
+
+ip domain-name tec.mx
+username tec secret segura
+crypto key generate rsa
+1024
+
+ip ssh version 2
+line vty 0 15
+transport input ssh
+login local
+
+!----------------------------------------------------
+
+hostname S3
+ip default-gateway 192.168.10.97
+no ip domain-lookup
+enable secret cisco
+
+line console 0
+password 123
+login
+logging synchronous
+
+service password-encryption
+
+interface vlan 1
+ip address 192.168.10.100 255.255.255.224
+no shutdown
+
+line vty 0 15
+password telnet
+login
+loggin synchronous
+
+ip domain-name tec.mx
+username tec secret segura
+crypto key generate rsa
+1024
+
+ip ssh version 2
+line vty 0 15
+transport input ssh
+login local
+
+----------------------------------------------------
+
+hostname S4
+ip default-gateway 192.168.10.97
+no ip domain-lookup
+enable secret cisco
+
+line console 0
+password 123
+login
+logging synchronous
+
+service password-encryption
+
+interface vlan 1
+ip address 192.168.10.101 255.255.255.224
+no shutdown
+
+line vty 0 15
+password telnet
+login
+loggin synchronous
+
+ip domain-name tec.mx
+username tec secret segura
+crypto key generate rsa
+1024
+
+ip ssh version 2
+line vty 0 15
+transport input ssh
+login local

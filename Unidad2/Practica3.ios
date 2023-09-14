@@ -1,0 +1,332 @@
+! Práctica 3 PT
+
+!! Switch 1
+hostname SITE
+! Contraseña privilegiado
+enable secret privi
+! Banner
+banner motd 'Accesando al Switch SITE'
+! Encriptar contraseñas
+service password-encryption
+
+! Deshabilitar DNS
+no ip domain-lookup
+
+! Dominio SSH
+ip domain-name cesar.3
+! Usuario / Contraseña SSH
+username site secret segura
+crypto key generate rsa
+y
+1024
+
+ip ssh version 2
+line vty 0 15
+transport input ssh
+login local
+
+! Contraseña consola
+line console 0
+password conso
+login
+
+! Respaldar archivo de ejecución
+copy running-config startup-config 
+
+! Activar puerto del Router
+interface f0/1
+no shutdown
+interface g0/2
+no shutdown
+
+!! Switch 2
+hostname EDIFICIO_1
+! Contraseña privilegiado
+enable secret privi1
+! Banner
+banner motd 'Accesando al Switch Edificio 1'
+! Encriptar contraseñas
+service password-encryption
+! Deshabilitar DNS
+no ip domain-lookup
+
+! Dominio SSH
+ip domain-name cesar.3
+! Usuario / Contraseña SSH
+username edificio1 secret segura1
+crypto key generate rsa
+y
+1024
+
+ip ssh version 2
+line vty 0 15
+transport input ssh
+login local
+
+! Contraseña consola
+line console 0
+password conso1
+login
+
+! Respaldar archivo de ejecución
+copy running-config startup-config 
+
+!! Switch 3
+hostname EDIFICIO_2
+! Contraseña privilegiado
+enable secret privi2
+! Banner
+banner motd 'Accesando al Switch Edificio 2'
+! Encriptar contraseñas
+service password-encryption
+! Deshabilitar DNS
+no ip domain-lookup
+
+! Dominio SSH
+ip domain-name cesar.3
+! Usuario / Contraseña SSH
+username edificio2 secret segura2
+crypto key generate rsa
+y
+1024
+
+ip ssh version 2
+line vty 0 15
+transport input ssh
+login local
+
+! Contraseña consola
+line console 0
+password conso2
+login
+
+! Respaldar archivo de ejecución
+copy running-config startup-config 
+
+!! Switch 4
+hostname EDIFICIO_3
+! Contraseña privilegiado
+enable secret privi3
+! Banner
+banner motd 'Accesando al Switch Edificio 3'
+! Encriptar contraseñas
+service password-encryption
+
+! Deshabilitar DNS
+no ip domain-lookup
+
+! Dominio SSH
+ip domain-name cesar.3
+! Usuario / Contraseña SSH
+username edificio3 secret segura3
+crypto key generate rsa
+y
+1024
+
+ip ssh version 2
+line vty 0 15
+transport input ssh
+login local
+
+! Contraseña consola
+line console 0
+password conso3
+login
+
+! Respaldar archivo de ejecución
+copy running-config startup-config 
+
+!! Router
+
+hostname TecNM
+
+! Dominio SSH
+ip domain-name cesar.3
+! Usuario / Contraseña SSH
+username router secret segura4
+crypto key generate rsa
+y
+1024
+
+ip ssh version 2
+line vty 0 15
+transport input ssh
+login local
+
+
+!! Switch 4
+hostname EDIFICIO_3B
+! Contraseña privilegiado
+enable secret privi3b
+! Banner
+banner motd 'Accesando al Switch Edificio 3B'
+! Encriptar contraseñas
+service password-encryption
+
+! Deshabilitar DNS
+no ip domain-lookup
+
+! Dominio SSH
+ip domain-name cesar.3
+! Usuario / Contraseña SSH
+username edificio3b secret segura3b
+crypto key generate rsa
+y
+1024
+
+ip ssh version 2
+line vty 0 15
+transport input ssh
+login local
+
+! Contraseña consola
+line console 0
+password conso3b
+login
+
+! Respaldar archivo de ejecución
+copy running-config startup-config 
+
+
+!! Generar VLANs y activarlas con VTP
+! 172.25.10.0/27
+vlan 10
+name RH
+! 172.25.20.0/27
+vlan 20
+name CONTA
+! 172.25.30.0/27
+vlan 30
+name COMPRAS
+! 172.25.40.0/27
+vlan 40
+name DIRECCION
+! 172.25.50.0/27
+vlan 50
+name SECRE
+! 172.25.60.0/27
+vlan 60
+name MOVILES
+! 172.25.70.0/27
+vlan 70
+name VENTAS
+! 172.25.150.0/27
+vlan 150
+name CAPACITACION
+! 172.25.80.0/27
+vlan 80
+name CAPACITACION
+
+! Asignar VLAN a cada puerto
+interface range !f0/XX-XX
+switchport mode access
+switchport access vlan X
+
+! Troncales
+interface g0/1
+switchport mode trunk
+
+! Protocolo VTP
+! Switch SITE
+vtp mode server
+vtp version 2
+vtp domain redes
+vtp password cisco
+
+! Resto de switches
+vtp mode client
+vtp version 2
+vtp domain redes
+vtp password cisco
+
+
+!! Direccionamiento al bloque de Admin
+ip default-gateway 172.25.150.1
+interface vlan 150
+! SITE
+ip address 172.25.150.2 255.255.255.224
+! Edificio 1
+ip address 172.25.150.3 255.255.255.224
+! Edificio 2
+ip address 172.25.150.4 255.255.255.224
+! Edificio 3
+ip address 172.25.150.5 255.255.255.224
+! Edificio 3B
+ip address 172.25.150.6 255.255.255.224
+
+
+!! Enrutar vlans
+interface g0/2.10
+encapsulation dot1Q 10
+ip add 172.25.10.1 255.255.255.224
+
+interface g0/2.20
+encapsulation dot1Q 20
+ip add 172.25.20.1 255.255.255.224
+
+interface g0/2.30
+encapsulation dot1Q 30
+ip add 172.25.30.1 255.255.255.224
+
+interface g0/2.40
+encapsulation dot1Q 40
+ip add 172.25.40.1 255.255.255.224
+
+interface g0/2.50
+encapsulation dot1Q 50
+ip add 172.25.50.1 255.255.255.224
+
+interface g0/2.60
+encapsulation dot1Q 60
+ip add 172.25.60.1 255.255.255.224
+
+interface g0/2.70
+encapsulation dot1Q 70
+ip add 172.25.70.1 255.255.255.224
+
+interface g0/2.80
+encapsulation dot1Q 80
+ip add 172.25.80.1 255.255.255.224
+
+interface g0/2.150
+encapsulation dot1Q 150
+ip add 172.25.150.1 255.255.255.224
+
+!! Restringir acceso, sólo admins
+access-list 21 permit host 172.25.150.11
+access-list 21 permit host 172.25.150.12
+access-list 21 permit host 172.25.150.13
+access-list 21 permit host 172.25.150.14
+access-list 21 permit host 172.25.150.15
+
+line vty 0 15
+access-class 21 in
+
+access-list 1 deny any
+
+
+!! DHCP en rúter
+ip dhcp excluded-address 172.25.10.1 172.25.10.3
+ip dhcp pool RH
+network 172.25.10.0 255.255.255.224
+default-router 172.25.10.1
+
+ip dhcp excluded-address 172.25.60.1
+ip dhcp pool MOVILES
+network 172.25.60.0 255.255.255.224
+default-router 172.25.60.1
+
+ip dhcp excluded-address 172.25.80.1 172.25.80.3
+ip dhcp pool CAPACITACION
+network 172.25.80.0 255.255.255.224
+default-router 172.25.80.1
+
+ip dhcp excluded-address 172.25.40.1 172.25.40.4
+ip dhcp pool DIRECCION
+network 172.25.40.0 255.255.255.224
+default-router 172.25.40.1
+
+!! DNS
+! Rúter
+ip dhcp pool ADMIN
+dns-server 172.25.150.10

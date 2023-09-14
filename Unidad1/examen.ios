@@ -1,0 +1,30 @@
+conectado al SITE en el puerto f0/22
+
+
+interface range g0/1, f0/24, f0/1, f0/10, f0/11, f0/12
+no shutdown
+
+!! 3. Seguridad de puertos
+
+! a. Modo sticky en donde haya hosts
+interface range f0/10, f0/11, f0/12, f0/1, f0/24
+switchport mode access
+switchport port-security
+switchport port-security mac-address sticky
+! Por si algo sale mal
+! clear port-security all
+
+! b. Activar restict 
+switchport port-security violation restrict
+
+! c. Solo un Host, solo permitir una MAC
+interface range f0/1, f0/10, f0/11, f0/12
+switchport port-security maximum 1
+
+! e. Puertos AP, permitir 3 (en el puerto donde estén conectados los ap al switch)
+interface f0/24
+switchport port-security maximum 3
+
+clear port-security dynamic
+show port-security address
+

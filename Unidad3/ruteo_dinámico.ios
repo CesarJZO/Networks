@@ -1,0 +1,11 @@
+
+passive-interface g0/1
+
+
+version 2
+
+passive-interface serial
+passive-interface g
+network
+default-information originate
+no auto-summary

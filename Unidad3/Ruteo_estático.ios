@@ -1,0 +1,30 @@
+! TODO: 
+! [ ] Ruteo estático nomás donde hay dos WAN
+! [ ] Ruteo dinámico
+! [ ] En las interfaces que están conectadas en los rúters, poner el default gateway de cada red
+
+! 
+
+! (config)#
+router rip
+version 2
+no auto-summary
+! Redistribuir ruta estática prederterminada
+default-information originate
+
+! inter s0/0/0 (un extremo del serial)
+ip address 200.100.50.9 255.255.255.252
+no shutdown
+! inter s0/0/1 (el otro extremo del serial)
+ip address 200.100.50.10 255.255.255.252
+no shutdown
+
+
+
+router rip
+version 2
+network 
+no auto-summary
+
+show ip protocols
+show ip route

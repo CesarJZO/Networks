@@ -1,0 +1,261 @@
+router id -> 20.20.20.20 (SALTILLO)
+router id -> 10.10.10.10 (MERIDA)
+router id -> por interface (MONTERREY)
+
+! Consultas
+do show ip protocols
+do show ip route
+do show ip ospf interface
+
+
+! Saltillo
+
+...
+router ospf 7
+! Las redes directamente conectadas
+network 200.100.50.0 0.0.0.3 area 51
+network 200.100.50.4 0.0.0.3 area 51
+network 10.20.10.0 0.0.0.63 area 51
+network 10.20.20.0 0.0.0.31 area 51
+
+! La interfaz pasiva se usa en los puertos que están conectados a los switches
+router ospf 7
+passive-interface g0/0
+passive-interface g0/1
+
+router ospf 7
+auto-cost reference-bandwidth 1000
+
+
+! Mérida
+
+ip route 0.0.0.0 0.0.0.0 [s0/0/0]
+
+...
+router ospf 7
+! (Tiene que ser la misma área)
+network 192.168.50.0 0.0.0.127 area 51
+network 192.168.51.0 0.0.0.63 area 51
+network 200.100.50.0 0.0.0.3 area 51
+network 200.100.50.8 0.0.0.3 area 51
+
+router ospf 7
+passive-interface g0/0
+passive-interface g0/1
+
+
+! Cálculo de costos
+router ospf 7
+! El ancho debe ser consistente entre todos los rúters
+auto-cost reference-bandwidth 1000
+
+
+! Monterrey
+
+router ospf 7
+! y ya (en automático toma la interfaz virtual)
+...
+router ospf 7
+network 200.100.50.4 0.0.0.3 area 51
+network 200.100.50.8 0.0.0.3 area 51
+network 172.30.80.0 0.0.0.127 area 51
+network 172.40.80.0 0.0.0.31 area 51
+
+router ospf 7
+passive-interface g0/0
+passive-interface g0/1
+passive-interface s0/0/1
+passive-interface s0/1/0
+
+
+! Resetear ospf
+! Una opción es guardar la config antes del reset
+clear ip ospf process
+
+
+
+
+
+cisco 
+!! Habilitar OSPFv2
+router ospf [id-proceso] !! 1-65,535
+
+!! Configurar ID del router
+router-id [id-router] 
+!! Ejemplo
+router-id 10.10.10.10
+
+!! Mostrar protocolos
+show ip protocols
+
+!! Activar ID por direccion loopback 
+255.255.255.255
+
+!! Configuracion por Loopback - Ejemplo
+interface loopback 0
+ip address 1.1.1.1 255.255.255.255
+end
+
+!! Modificar ID - Nivel privilegiado
+clear ip ospf process
+y
+show ip protocols 
+
+!! Comando Network
+router ospf 10 
+!! network [direccion-ip-interfaz] 0.0.0.0 area [id-area]
+network 172.16.1.0 0.0.0.255 area 0
+
+!! Evitar transmision de mensajes y permitir que la red se anuncie
+router ospf 10
+passive-interface g0/0
+end
+
+!! Formula para calcular el costo de OSPF
+Costo = ancho de banda de referencia(10^8) / ancho de banda de la interfaz
+
+Costo = 100 000 000 / ancho de banda de la interfaz en bps
+
+!! Ajustar el ancho de banda de referencia
+auto-cost reference-bandwith Mb/s 
+
+!! Ajustar el ancho de banda de la interfaz
+bandwith [kilobits]
+
+!! Mostrar ancho de banda de interfaz predetermiando
+show interfaces ? | include BW
+
+!! Configuración manueal del costo OSPF
+!! Desde la interfaz
+ip ospf cost 
+
+
+!! Para evitar balanceo de cargas, aumentar el costo a una interfaz
+ip ospf cost
+
+!! Verifica que el router haya formado adyacencia con los routers vecinos
+!! Si no muestra el ID del router vecino (o no está en estado FULL), no se formó la adyacencia.
+show ip ospf neighbor
+
+!! Interfaces en OSPF resumida
+show ip ospf interface brief
+
+!! Dar una ruta predeterminada
+default-information originate 
+
+
+
+!Eliminar protocolos RIP de la Topologia usada
+
+
+
+
+!! Que tenga una IP
+!! Que esté conectada
+!! Que no esté apagada
+
+!! Merida
+router ospf 7
+do show ip protocols 
+router-id 10.10.10.10
+
+!! Saltillo
+interface loopback 0
+ip address 20.20.20.20
+do show run
+router ospf 7
+
+!! Monterrey 
+router ospf 7
+do show ip protocols
+
+!!  DAR DE ALTA UNICAMENTE LAS REDES CONECTADAS DIRECTAMENTE OSPF
+
+!! Merida
+router ospf 7
+network 192.168.50.0 0.0.0.127 area 51
+do show ip protocols
+network 192.168.51.0 0.0.0.63 area 51
+network 200.100.50.0 0.0.0.3 area 51
+do show ip protocols
+
+!! Saltillo
+router ospf 7
+network 200.100.50.0 0.0.0.3 area 51
+network 200.100.50.4 0.0.0.3 area 51
+network 10.20.10.0 0.0.0.6 area 51
+network 10.20.20.0 0.0.0.31 area 51
+do show ip protocols
+do show ip route 
+
+
+!! Monterrey
+router ospf 7
+network 200.100.50.4 0.0.0.3 area 51
+network 200.100.50.8 0.0.0.3 area 51
+network 172.30.80.0 0.0.0.127 area 51
+network 172.40.80 0.0.0.31 area 51
+do show ip route 
+default-information originate
+
+
+!! Merida
+router ospf 7
+passive-interface g0/0
+passive-interface g0/1
+
+!! Saltillo
+router ospf 7
+passive-interface g0/0
+passive-interface g0/1
+
+!! Monterrey
+router ospf 7
+passive-interface g0/0
+passive-interface g0/1
+passive-interface serial 0/0/1
+passive-interface serial 0/1/0
+show ip protocols
+
+router-id 30.30.30.30
+clear ip ospf process
+
+!! Merida
+router ospf 7
+do show ip ospf interface
+auto-cost reference-bandwith 1000
+
+!! Saltillo
+router ospf 7
+do show ip ospf interface
+auto-cost reference-bandwith 1000
+
+!! Monterrey
+router ospf 7
+do show ip ospf interface
+auto-cost reference-bandwith 1000
+
+router ospf 7
+auto-cost reference-bandwith 10000
+
+!! Saltillo
+router ospf 7 
+auto-cost reference-bandwith 10000
+
+!! Merida
+router ospf 7
+auto-cost reference-bandwith 10000
+interface serial 0/0/0
+bandwith 500
+
+!! Monterrey
+interface serial 0/0/0
+bandwith 500
+
+!! Merida
+show interface [interface]
+ip ospf interface [interface]
+interface serial 0/0/1
+ip ospf cost 10000
+do show ip ospf interface serial 0/0/1
+do show ip route 

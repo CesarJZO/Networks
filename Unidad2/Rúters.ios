@@ -1,0 +1,24 @@
+! Unidad 2
+
+line vty 0 4
+password 123
+login
+
+interface g0/1
+no ip address
+duplex auto
+speed auto
+
+shutdown
+
+interface g0/0.10
+encapsulation dotig 10
+ip add 192.168.10.1c255.255.255.224
+
+interface vlan 1
+no ip address
+shutdown
+
+inter g0/0.20
+encapsulation do 20
+ip address 192.168.20.1 255.255.255.128

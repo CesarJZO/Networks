@@ -1,0 +1,80 @@
+! Julio Sebastían Rodríguez Teniente
+! Josué David Hernández Gonzáles
+! César Javier Zárate Ochoa
+
+! Resetear switches
+write erase
+reload
+
+! Parámtros globales S-1
+banner motd 'Accesando al Switch 1'
+hostname S-1
+enable secret privi
+ip default-gateway 172.25.100.1
+
+interface vlan 100
+ip add 172.25.100.2 255.255.255.224
+exit
+
+ip domain-name its.mx
+username tec secret segura
+crypto key generate rsa
+y
+1024
+
+ip ssh version 2
+line vty 0 15
+transport input ssh
+login local
+
+
+! Parámtros globales S-2
+banner motd 'Accesando al Switch 2'
+hostname S-2
+enable secret privi
+ip default-gateway 172.25.100.1
+
+interface vlan 100
+ip add 172.25.100.3 255.255.255.224
+
+
+line vty 0 15
+password telnet
+login
+
+! Configuraciones de vlan
+
+vlan 10
+name MAESTROS
+interface range f0/2-6
+switchport mode access
+switchport access vlan 10
+description 'VLAN de Maestros'
+
+vlan 20
+name ESTUDIANTES
+interface range f0/7-11
+switchport mode access
+switchport access vlan 20
+description 'VLAN de Estudiantes'
+
+vlan 30
+name DIRECCION
+interface range f0/12-16
+switchport mode access
+switchport access vlan 30
+description 'VLAN de Direccion'
+
+vlan 100
+name ADMINISTRACION
+interface f0/20
+switchport mode access
+switchport access vlan 100
+description 'VLAN de Administracion'
+
+! Cascadeo
+interface f0/1
+switchport mode trunk
+
+! Limitar VLANs
+switchport trunk allowed vlan 10,20,30,100

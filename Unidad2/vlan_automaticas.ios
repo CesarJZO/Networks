@@ -1,0 +1,53 @@
+!! Edificio 1
+
+! VLAN Name           Status    Ports
+! ---- -------------- --------- ---------------
+! 10   MAESTROS       active    Fa0/1, Fa0/9
+! 20   LABORATORIO    active    Fa0/8, Fa0/17
+! 30   DIRECCION      active    Fa0/19
+! 40   RH             active    Fa0/11, Fa0/12
+! 100  ADMIN          active    Fa0/23, Fa0/24
+
+
+!! Edificio 2
+
+! VLAN Name           Status    Ports
+! ---- -------------- --------- ---------------
+! 10   MAESTROS       active    Fa0/1, Fa0/2
+! 20   LABORATORIO    active    Fa0/10
+! 30   DIRECCION      active    Fa0/15
+! 40   RH             active    Fa0/11, Fa0/12
+! 100  ADMIN          active    Fa0/24
+
+
+!! Edificio 3
+
+! VLAN Name           Status    Ports
+! ---- -------------- --------- ---------------
+! 10   MAESTROS       active    Fa0/1
+! 20   LABORATORIO    active    Fa0/5
+! 30   DIRECCION      active    Fa0/18
+! 40   RH             active    Fa0/10
+! 100  ADMIN          active    Fa0/24
+
+! Eliminar los puertos de las vlans
+sho vlan brief
+interface range f0/1...
+no sw acc vlan 999
+
+! Para borrar otras configs de las vlans
+delete vlan.dat
+
+reload
+
+! Activar el modo VTP
+! (config)#
+vtp mode server
+vtp domain its
+vtp password 123
+vtp version 2
+
+show vtp status
+
+! Verificar el troncal
+show interface trunk

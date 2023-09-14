@@ -1,0 +1,92 @@
+!* RC_EO34_19051229
+
+!! Telecomunicaciones
+ip route 192.168.10.0 255.255.255.255 s0/0
+ip route 172.30.0.0 255.255.224.0 s1/0
+
+! todo: OSPF L
+
+!! Cliente 1
+ip route 0.0.0.0 0.0.0.0 s3/0
+router ospf 12
+router-id 1.1.1.1
+network 192.168.10.4 0.0.0.3 area 25
+network 192.168.10.8 0.0.0.3 area 25
+network 192.168.10.12 0.0.0.3 area 25
+network 192.168.10.160 0.0.0.31 area 25
+passive-interface g4/0
+auto-cost reference-bandwidth 10000
+default-information originate
+! redistribute static Por si no jala
+
+!! Sucursal 1
+router ospf 12
+!! De mientras
+router-id 5.5.5.5
+network 192.168.10.0 0.0.0.3 area 25
+network 192.168.10.4 0.0.0.3 area 25
+network 192.168.10.32 0.0.0.31 area 25
+
+!! Sucursal 2
+router ospf 12
+router-id 2.2.2.2
+network 192.168.10.0 0.0.0.3 area 25
+network 192.168.10.8 0.0.0.3 area 25
+network 192.168.10.16 0.0.0.3 area 25
+network 192.168.10.64 0.0.0.31 area 25
+auto-cost reference-bandwidth 10000
+
+!! Sucursal 3
+interface loopback 10
+ip address 3.3.3.3 255.255.255.255
+router ospf 12
+network 192.168.10.12 0.0.0.3 area 25
+network 192.168.10.16 0.0.0.3 area 25
+network 192.168.10.20 0.0.0.3 area 25
+network 192.168.10.128 0.0.0.31 area 25
+auto-cost reference-bandwidth 10000
+
+
+!! Sucursal 4
+router ospf 12
+router-id 4.4.4.4
+network 192.168.10.20 0.0.0.3 area 25
+network 192.168.10.96 0.0.0.31 area 25
+auto-cost reference-bandwidth 10000
+
+
+! todo: RIP  R
+
+!! Cliente 2
+ip route 0.0.0.0 0.0.0.0 s0/0
+router rip
+version 2
+no auto-summary
+network 172.30.60.0
+default-information originate
+redistribute static
+
+!! RED 1
+router rip
+version 2
+no auto-summary
+network 172.30.60.0
+network 172.30.61.0
+network 172.30.63.0
+network 172.30.30.0
+
+!! RED 2
+router rip
+version 2
+no auto-summary
+network 172.30.61.0
+network 172.30.62.0
+network 172.30.10.0
+
+!! RED 3
+router rip
+version 2
+no auto-summary
+network 172.30.62.0
+network 172.30.63.0
+network 172.30.20.0

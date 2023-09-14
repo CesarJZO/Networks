@@ -1,0 +1,148 @@
+
+!!! Máscaras
+!     Pref  hosts
+! .128/25 -> 126
+! .192/26 -> 62
+! .224/27 -> 30
+! .240/28 -> 14
+! .248/29 -> 6
+! .252/30 -> 2
+
+!----------------------------------------!
+
+!! Switch y vlan de admins
+
+!! Switch 1
+hostname Edificio1
+enable secret privi
+interface vlan 100
+ip add 192.168.100.2 255.255.255.240
+line vty 0 15
+password 123
+login
+
+!! Switch 2
+hostname Edificio2
+enable secret privi
+interface vlan 100
+ip add 192.168.100.3 255.255.255.240
+line vty 0 15
+password 123
+login
+
+!! Switch 3
+hostname Edificio3
+enable secret privi
+interface vlan 100
+ip add 192.168.100.4 255.255.255.240
+line vty 0 15
+password 123
+login
+
+vlan 10
+name MAESTROS
+vlan 20
+name LABORATORIO
+vlan 30
+name DIRECCION  
+vlan 40
+name RH
+vlan 100
+name ADMIN
+
+!! Mostrar vlans
+sho vlan brief
+
+! Por defecto, todas las interfaces (puertos) están 
+! asignadas a la vlan1
+
+! Switch 1
+
+interface range f0/23-24
+switchport mode access
+! Aislar de otras redes
+switchport access vlan 100
+description 'Vlan de administrador'
+
+! Switch 2 y 3
+
+interface f0/24
+switchport mode access
+switchport access vlan 100
+description 'Vlan de administrador'
+
+!! Vlan de MAESTROS
+
+interface range f0/1,f0/9
+switchport mode access
+switchport access vlan 10
+description 'Vlan de Maestros'
+
+!! Vlan de LABORATORIO
+
+interface range f0/17,f0/8
+sw mod acc
+sw acc vlan 20
+description 'Vlan de Laboratorio'
+
+!! Vlan de DIRECCION
+
+interface f0/19
+sw mod acc
+sw acc vlan 30
+description 'Vlan de Direccion'
+
+interface range f0/11-12
+sw mod acc
+sw acc vlan 40
+description 'Vlan de Recursos humanos'
+
+!! Switch1
+
+interface g0/1
+description  Terminal a Edificio2
+sw mo tr
+
+!! Switch2
+
+interface g0/1
+description  Terminal a Edificio1
+sw mo tr
+interface g0/2
+description  Terminal a Edificio3
+sw mo tr
+
+!! Switch3
+interface g0/1
+description  Terminal a Edificio 2
+sw mo tr
+
+sho inter tru
+
+!! El troncal de los switches
+!  [ ] Hacer lo mismo en el switch 2
+
+! Switch 1    
+interface g0/1
+switchport trunk allowed vlan 1,10,20,30,40
+switchport trunk allowed vlan add 100
+
+! Switch 2
+interface range g0/1, g0/2
+switchport trunk allowed vlan 1,10,20,30,40,100
+
+! Switch 3
+interface g0/1
+switchport trunk allowed vlan 1,10,20,30,40,100
+
+
+! Por si la cagas
+sw acc vlan [la vlan]
+! Se entra a los puertos (interfaces), y se le cambia su vlan
+! el comando no, puede eliminar o revertir el comando que quieras
+
+!! Tarea
+!  [*] Cascadear un nuevo Switch (conectándolo al switch2) y
+!     poner un equipo por cada VLAN que hay en la topología
+!  [*] Preparar un puerto para administrador en los otros dos
+!     switches. No es necesario añadir un equipo

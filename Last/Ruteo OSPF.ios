@@ -1,0 +1,122 @@
+!* Consultas
+show ip protocols
+show ip route
+show ip ospf interface [S, G]
+show ip ospf neighbor
+show ip ospf interface brief
+!* Modificar ID
+clear ip ospf process
+
+
+!! ISP
+ip route 10.20.0.0 255.255.192.0 s0/0
+ip route 192.168.48.0 255.255.248.0 s1/0
+
+!! Empresa 1
+ip route 0.0.0.0 0.0.0.0 s4/0
+interface loopback 0
+ip address 1.1.1.1 255.255.255.255
+router ospf 12
+network 200.100.50.0 0.0.0.3 area 1
+network 200.100.50.4 0.0.0.3 area 1
+network 200.100.50.8 0.0.0.3 area 1
+network 10.20.10.0 0.0.0.63 area 1
+! no auto-summary
+default-information originate
+redistribute static
+
+
+!* Sucursal 1
+! Activar protocolo
+router ospf 12
+! Definir ID del ruteador
+router-id 10.20.20.1
+! Publicar las redes directamente conectadas
+network 200.100.50.0 0.0.0.3 area 1
+network 200.100.50.12 0.0.0.3 area 1
+network 10.20.20.0 0.0.0.127 area 1
+! Interfaces pasivas
+passive-interface g0/1
+passive-interface g0/2
+! Ajuste de ancho de banda de referencia
+! auto-cost reference-bandwidth 5000
+
+
+!* Sucursal 2
+router ospf 12
+router-id 10.20.30.1
+network 200.100.50.4 0.0.0.3 area 1
+network 200.100.50.12 0.0.0.3 area 1
+network 200.100.50.16 0.0.0.3 area 1
+network 10.20.30.0 0.0.0.31 area 1
+passive-interface g0/1
+passive-interface g0/2
+passive-interface s0/1/1
+
+!* Sucursal 3
+router ospf 12
+router-id 10.20.40.1
+network 200.100.50.8 0.0.0.3 area 1
+network 200.100.50.16 0.0.0.3 area 1
+network 10.20.40.0 0.0.0.255 area 1
+passive-interface g0/1
+passive-interface g0/2
+passive-interface s0/1/0
+passive-interface s0/1/1
+
+
+!! Empresa 2
+ip route 0.0.0.0 0.0.0.0 s0/0/0
+router ospf 12
+interface loopback 0
+ip address 2.2.2.2 255.255.255.255
+exit
+network 200.100.50.0 0.0.0.3 area 2
+network 200.100.50.4 0.0.0.3 area 2
+network 192.168.50.0 0.0.0.127 area 2
+passive-interface g0/1
+passive-interface s0/1/1
+! no auto-summary
+default-information originate
+
+
+!* Edificio 1
+router ospf 12
+router-id 192.168.52.1
+network 200.100.50.4 0.0.0.3 area 2
+network 200.100.50.8 0.0.0.3 area 2
+network 192.168.52.0 0.0.0.31 area 2
+passive-interface g0/1
+
+!* Edificio 2
+router ospf 12
+router-id 192.168.51.1
+network 200.100.50.0 0.0.0.3 area 2
+network 200.100.50.8 0.0.0.3 area 2
+network 192.168.51.0 0.0.0.63 area 2
+passive-interface g0/1
+
+
+!! Pasos
+
+! Identificar los enlaces
+!   Red propia
+!   Dirección IP (del puerto)
+!   Tipo de red (Ethernet, Serial)
+!   Costo del enlace
+!   Vecinos
+
+! Encontrarse con redes conectadas directamente
+
+! Generar paquete de estado de enlace (LSP)
+
+! Saturar con LSP
+
+! Guardar un mapa de la topología para calcular la mejor ruta
+
+
+!* En caso de ajustar el ancho de banda y el costo manualmente
+interface s0/0/1
+bandwidth 64 (kilobits)
+ip ospf cost 15625
+end

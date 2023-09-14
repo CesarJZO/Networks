@@ -1,0 +1,67 @@
+! Asignar IPs, accesos, las dos intranets deben tener el protocolo RIP
+
+!! DHCP
+interface g0/0
+ip address 10.20.20.1 255.255.255.128
+no shutdown
+
+ip dhcp excluded-address 10.20.20.1 10.20.20.8
+ip dhcp pool default 
+network 10.20.40.0 255.255.255.0
+default-router 10.20.40.1
+dns-server 8.8.8.8
+
+router rip
+version 2
+network [Las redes adyacentes]
+no auto-summary
+
+ip route 0.0.0.0 0.0.0.0
+
+!* Consultas
+show ip interface brief
+show ip route
+show ip running-config
+
+ISP Rutas sumarizadas
+R* Empresa1 y 2
+
+
+
+! ISP
+ip route 10.20.0.0 255.255.192.0 s0/0
+ip route 192.168.48.0 255.255.248.0 s1/0
+
+! Empresa 1
+router rip
+version 2
+network 10.0.0.0
+network 200.100.50.0
+no auto-summary
+default-information originate
+redistribute static
+
+! Sucursales
+router rip
+version 2
+no auto-summary
+network 10.0.0.0
+network 200.100.50.0
+
+! Empresa 2
+router rip
+version 2
+network 192.0.0.0
+network 200.100.50.0
+no auto-summary
+default-information originate
+redistribute static
+
+! Edificios
+router rip
+version 2
+network 192.0.0.0
+network 200.100.50.0
+no auto-summary
+
+
